@@ -3,7 +3,7 @@ import './GridTile.css';
 
 function GridTile(props) { 
     return (
-        <div className="tile" />
+        <div className={props.live ? 'tile live' : 'tile'} />
     ) 
 };
 

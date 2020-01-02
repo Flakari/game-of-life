@@ -8,3 +8,7 @@
 .tile:hover {
     background-color: yellow;
 }
+
+.live {
+    background-color: black;
+}
