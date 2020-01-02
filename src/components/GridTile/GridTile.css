@@ -1,0 +1,10 @@
+.tile {
+    display: inline-block;
+    height: 15px;
+    width: 15px;
+    background-color: lightgray;
+}
+
+.tile:hover {
+    background-color: yellow;
+}
