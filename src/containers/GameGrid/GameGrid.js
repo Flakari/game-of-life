@@ -17,6 +17,7 @@ function GameGrid() {
             counter++;
             if (Math.random() > 0.4) {
                 item.live = true;
+                item.active = true;
             }
             return (
                 <GridTile
@@ -27,6 +28,7 @@ function GameGrid() {
             );
         }));
         console.log(createHistory(grid.flat()));
+        console.log(findActiveTiles());
     }, [ grid ]);
 
     const createHistory = (grid) => {
@@ -51,6 +53,79 @@ function GameGrid() {
         condensedStr += charCount > 1 ? `${charCount}${currentLetter}` : currentLetter;
         return condensedStr;
     }
+
+    const findActiveTiles = () => {
+        let array = [];
+        for (let row = 0; row < grid.length; row++) {
+            for (let tile = 0; tile < grid[row].length; tile++) {
+                if (grid[row][tile].active) {
+                    console.log(checkAdjecentTiles(row, tile));
+                    array.push(`Active: ${[row, tile]}`);
+                }
+            }
+        }
+        return array;
+    };
+
+    const checkAdjecentTiles = (row, tile) => {
+        // Clockwise Order: [Right, Bottom Right, Bottom, Bottom Left, Left, Top Left, Top, Top Right]
+        const range = [
+            [row, tile + 1], [row + 1, tile + 1], [row + 1, tile], [row + 1, tile - 1], [row, tile - 1], 
+            [row - 1, tile -1], [row - 1, tile], [row - 1, tile + 1]
+        ];
+        if (row === 0) {
+            if (tile === 0) {
+                //check everything to right and bottom of tile
+                return [row, tile, range.slice(0, 3).map(item => {
+                    return grid[item[0]][item[1]];
+                })];
+            } else if (tile === grid[0].length - 1) {
+                //check everything to left and bottom of tile
+                return [row, tile, range.slice(2, 5).map(item => {
+                    return grid[item[0]][item[1]];
+                })];
+            } else {
+                //check everything except for top of tile
+                return [row, tile, range.slice(0, 5).map(item => {
+                    return grid[item[0]][item[1]];
+                })];
+            } 
+        } else if (row === grid.length - 1) {
+            if (tile === 0) {
+                //check everything to right and top of tile
+                return [row, tile, [...range.slice(6), range[0]].map(item => {
+                    return grid[item[0]][item[1]];
+                })];
+            } else if (tile === grid[0].length - 1) {
+                //check everything to left and top of tile
+                return [row, tile, range.slice(4, 7).map(item => {
+                    return grid[item[0]][item[1]];
+                })];
+            } else {
+                //check everything except for bottom
+                return [row, tile, [...range.slice(4), range[0]].map(item => {
+                    return grid[item[0]][item[1]];
+                })];
+            } 
+        } else {
+            if (tile === 0) {
+                //check everything but left tiles
+                return [row, tile, [...range.slice(6), ...range.slice(0, 3)].map(item => {
+                    return grid[item[0]][item[1]];
+                })];
+            } else if (tile === grid[0].length - 1) {
+                //check everything but right tiles
+                return [row, tile, range.slice(2, 7).map(item => {
+                    return grid[item[0]][item[1]];
+                })];
+            } else {
+                //check all tiles
+                return [row, tile, range.map(item => {
+                    return grid[item[0]][item[1]];
+                })];
+            } 
+        }
+    };
 
     const createGrid = () => {
         const array = [];
