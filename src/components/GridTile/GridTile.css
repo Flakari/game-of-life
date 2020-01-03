@@ -12,3 +12,7 @@
 .live {
     background-color: black;
 }
+
+.active {
+    background-color: blue;
+}

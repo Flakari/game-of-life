@@ -4,15 +4,22 @@ import GameMenu from '../../components/GameMenu/GameMenu';
 
 function GameContainer() {
     const [gameRunning, setGameRunning] = useState(false);
+    const [gameStart, setGameStart] = useState(true);
 
     const gameToggle = () => {
         setGameRunning(!gameRunning);
-    }
+    };
+
+    const startToggle = () => {
+        setGameStart(!gameStart);
+    };
 
     return (
         <main>
             <GameGrid 
                 running={gameRunning}
+                start={gameStart}
+                toggle={startToggle}
             />
             <GameMenu 
                 toggle={gameToggle}
