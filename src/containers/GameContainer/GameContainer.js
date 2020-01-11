@@ -7,6 +7,7 @@ function GameContainer() {
     const [gameRunning, setGameRunning] = useState(false);
     const [gameStart, setGameStart] = useState(true);
     const [history, setHistory] = useState([]);
+    const [generations, setGenerations] = useState(0);
 
     useEffect(() => {
         let newGrid = createGrid();
@@ -20,7 +21,7 @@ function GameContainer() {
             });
         }
         newGrid = generateActiveTiles(newGrid);
-        console.log(newGrid);
+        // console.log(newGrid);
         setGrid(newGrid);
     }, []);
 
@@ -28,7 +29,7 @@ function GameContainer() {
         const strGrid = grid.map(item => {
             return item.live ? 'T' : 'F';
         });
-        console.log(strGrid.join(''));
+        // console.log(strGrid.join(''));
 
         let condensedStr = '';
         let currentLetter = strGrid[0];
@@ -155,10 +156,24 @@ function GameContainer() {
         }
         return array;
     }
+   
+    const advanceGameTimer = () => {
+        setGrid(grid => advanceGame(grid));
+        setGenerations(generations => generations + 1);
+    }
+
+    useEffect(() => {
+        let timer = null;
+        if (!gameRunning) {
+            timer = setInterval(advanceGameTimer, 250);
+        } else {
+            clearInterval(timer);
+        }
+        return () => clearInterval(timer);
+    }, [gameRunning]);
 
     const gameToggle = () => {
-        advanceGame(grid);
-        //setGameRunning(!gameRunning);
+        setGameRunning(!gameRunning);
     };
 
     const startToggle = () => {
@@ -185,6 +200,7 @@ function GameContainer() {
             <GameMenu 
                 toggle={gameToggle}
             />
+            <p>{generations}</p>
         </main>
     );
 }

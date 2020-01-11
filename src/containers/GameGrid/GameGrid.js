@@ -8,7 +8,7 @@ function GameGrid(props) {
     useEffect(() => {
         let counter = -1;
         const flatGrid = props.grid.flat();
-        console.log(flatGrid)
+        // console.log(flatGrid)
         setDisplayGrid(flatGrid.map(item => {
             counter++;
             return (
