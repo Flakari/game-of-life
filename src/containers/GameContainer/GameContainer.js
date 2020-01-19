@@ -194,7 +194,7 @@ function GameContainer() {
     }, [gameRunning]);
 
     const gameToggle = () => {
-        if (clearBoard) return;
+        if (clearBoard) resetGame();
         setGameRunning(!gameRunning);
     };
 
