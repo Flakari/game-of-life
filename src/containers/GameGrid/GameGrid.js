@@ -14,12 +14,12 @@ function GameGrid(props) {
             return (
                 <GridTile
                     key={counter}
-                    live={item.live}
-                    active={item.active}
+                    live={item === 2}
+                    active={item === 1}
                 />
             );
         }));
-        props.addHistory(props.createHistory(flatGrid));
+        // props.addHistory(props.createHistory(flatGrid));
     }, [ props.grid ]);
 
     return (
