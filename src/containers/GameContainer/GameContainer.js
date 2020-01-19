@@ -5,14 +5,15 @@ import GameMenu from '../../components/GameMenu/GameMenu';
 function GameContainer() {
     const [grid, setGrid] = useState([]);
     const [gameRunning, setGameRunning] = useState(true);
-    const [history, setHistory] = useState([]);
+    const [clearBoard, setClearBoard] = useState(false);
+    // const [history, setHistory] = useState([]);
     const [generations, setGenerations] = useState(0);
 
     useEffect(() => {
         buildNewGrid();
     }, []);
 
-    const createHistory = (grid) => {
+    /*const createHistory = (grid) => {
         const strGrid = grid.map(item => {
             return item.live ? 'T' : 'F';
         });
@@ -33,7 +34,7 @@ function GameContainer() {
         }
         condensedStr += charCount > 1 ? `${charCount}${currentLetter}` : currentLetter;
         return condensedStr;
-    }
+    }*/
 
     const advanceGame = gameGrid => {
         const dead = 0, active = 1, live = 2;
@@ -42,7 +43,7 @@ function GameContainer() {
         for (let i = 0; i < gameGrid.length; i++) {
             for (let j = 0; j < gameGrid[0].length; j++) {
                 let aliveCount = 0;
-                if (gameGrid[i][j] === 1 || gameGrid[i][j] === 2) {
+                if (gameGrid[i][j] === active || gameGrid[i][j] === live) {
                     aliveCount = checkAdjecentTiles(i, j, gameGrid)[2].filter(item => item[2] === 2).length;
 
                     if (gameGrid[i][j] === live && (aliveCount < 2 || aliveCount > 3)) {
@@ -142,7 +143,6 @@ function GameContainer() {
         for(let i = 0; i < 30; i++) {
             array.push([]);
             for(let j = 0; j < 46; j++) {
-                // array[i].push({live: false, active: false});
                 array[i].push(0);
             }
         }
@@ -167,7 +167,15 @@ function GameContainer() {
         buildNewGrid();
         // setHistory([]);
         setGenerations(0);
+        if (clearBoard) setClearBoard(false);
         if (!gameRunning) setGameRunning(true);
+    }
+
+    const clearGame = () => {
+        setGrid(createGrid);
+        setGenerations(0);
+        if (gameRunning) setGameRunning(false);
+        if (!clearBoard) setClearBoard(true);
     }
    
     const advanceGameTimer = () => {
@@ -177,7 +185,7 @@ function GameContainer() {
 
     useEffect(() => {
         let timer = null;
-        if (gameRunning) {
+        if (gameRunning && !clearBoard) {
             timer = setInterval(advanceGameTimer, 75);
         } else {
             clearInterval(timer);
@@ -186,14 +194,15 @@ function GameContainer() {
     }, [gameRunning]);
 
     const gameToggle = () => {
+        if (clearBoard) return;
         setGameRunning(!gameRunning);
     };
 
-    const addToHistory = str => {
+    /*const addToHistory = str => {
         const tempHistory = JSON.parse(JSON.stringify(history));
         if (str !== 'undefined') tempHistory.push(str);
         setHistory(tempHistory);
-    }
+    }*/
 
     return (
         <main>
@@ -201,10 +210,12 @@ function GameContainer() {
                 grid={grid}
             />
             <GameMenu 
+                generations={generations}
                 toggle={gameToggle}
                 reset={resetGame}
+                clear={clearGame}
+                running={gameRunning}
             />
-            <p>{generations}</p>
         </main>
     );
 }

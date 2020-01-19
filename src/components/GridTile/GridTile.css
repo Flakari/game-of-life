@@ -1,18 +1,9 @@
 .tile {
     display: inline-block;
-    height: 15px;
-    width: 15px;
-    background-color: lightgray;
-}
-
-.tile:hover {
-    background-color: yellow;
+    
+    background-color: #72c1e8;
 }
 
 .live {
     background-color: black;
-}
-
-.active {
-    background-color: blue;
 }
