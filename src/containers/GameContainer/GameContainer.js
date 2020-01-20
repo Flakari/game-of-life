@@ -7,7 +7,7 @@ function GameContainer() {
     const [gameRunning, setGameRunning] = useState(true);
     const [clearBoard, setClearBoard] = useState(false);
     // const [history, setHistory] = useState([]);
-    const [generations, setGenerations] = useState(0);
+    const [generations, setGenerations] = useState(1);
 
     useEffect(() => {
         buildNewGrid();
@@ -166,16 +166,16 @@ function GameContainer() {
     const resetGame = () => {
         buildNewGrid();
         // setHistory([]);
-        setGenerations(0);
+        setGenerations(1);
         if (clearBoard) setClearBoard(false);
         if (!gameRunning) setGameRunning(true);
     }
 
     const clearGame = () => {
         setGrid(createGrid);
-        setGenerations(0);
         if (gameRunning) setGameRunning(false);
         if (!clearBoard) setClearBoard(true);
+        setGenerations('-');
     }
    
     const advanceGameTimer = () => {
