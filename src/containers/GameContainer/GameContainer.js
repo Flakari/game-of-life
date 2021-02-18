@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import GameGrid from '../GameGrid/GameGrid';
 import GameMenu from '../../components/GameMenu/GameMenu';
+
+const gridSize = [30, 46]
 
 function GameContainer() {
     const [grid, setGrid] = useState([]);
@@ -8,10 +10,6 @@ function GameContainer() {
     const [clearBoard, setClearBoard] = useState(false);
     // const [history, setHistory] = useState([]);
     const [generations, setGenerations] = useState(1);
-
-    useEffect(() => {
-        buildNewGrid();
-    }, []);
 
     /*const createHistory = (grid) => {
         const strGrid = grid.map(item => {
@@ -36,7 +34,45 @@ function GameContainer() {
         return condensedStr;
     }*/
 
-    const advanceGame = gameGrid => {
+    const checkAdjecentTiles = useCallback((row, column, grid) => {
+        const [rowSize, columnSize] = gridSize;
+        const adjecentArray = [];
+
+        for (let i = row - 1; i <= row + 1; i++) {
+            if (i < 0 || i > rowSize - 1) {
+                continue;
+            }
+
+            for (let j = column - 1; j <= column + 1; j++) {
+                if (j < 0 || j > columnSize - 1 || (i === row && j === column)) {
+                    continue;
+                }
+
+                adjecentArray.push([i, j, grid[i][j]]);
+            }
+        }
+        return [row, column, adjecentArray];
+    }, []);
+
+    const generateActiveTiles = useCallback(funcGrid => {
+        const dead = 0, active = 1, live = 2;
+
+        for (let row = 0; row < funcGrid.length; row++) {
+            for (let tile = 0; tile < funcGrid[row].length; tile++) {
+                if (funcGrid[row][tile] === live) {
+                    const activeTiles = checkAdjecentTiles(row, tile, funcGrid);
+                    for (let tile of activeTiles[2]) {
+                        if (tile[2] === dead) {
+                            funcGrid[tile[0]][tile[1]] = active;
+                        }
+                    }
+                }
+            }
+        }
+        return funcGrid
+    }, [checkAdjecentTiles]);
+
+    const advanceGame = useCallback(gameGrid => {
         const dead = 0, active = 1, live = 2;
 
         let tempGrid = JSON.parse(JSON.stringify(gameGrid));
@@ -58,98 +94,21 @@ function GameContainer() {
         }
         generateActiveTiles(tempGrid);
         setGrid(tempGrid);
-    };
-
-    const generateActiveTiles = funcGrid => {
-        const dead = 0, active = 1, live = 2;
-
-        for (let row = 0; row < funcGrid.length; row++) {
-            for (let tile = 0; tile < funcGrid[row].length; tile++) {
-                if (funcGrid[row][tile] === live) {
-                    const activeTiles = checkAdjecentTiles(row, tile, funcGrid);
-                    for (let tile of activeTiles[2]) {
-                        if (tile[2] === dead) {
-                            funcGrid[tile[0]][tile[1]] = active;
-                        }
-                    }
-                }
-            }
-        }
-        return funcGrid
-    };
-
-    const checkAdjecentTiles = (row, tile, grid) => {
-        // Clockwise Order: [Right, Bottom Right, Bottom, Bottom Left, Left, Top Left, Top, Top Right]
-        const range = [
-            [row, tile + 1], [row + 1, tile + 1], [row + 1, tile], [row + 1, tile - 1], [row, tile - 1], 
-            [row - 1, tile -1], [row - 1, tile], [row - 1, tile + 1]
-        ];
-        if (row === 0) {
-            if (tile === 0) {
-                //check everything to right and bottom of tile
-                return [row, tile, range.slice(0, 3).map(item => {
-                    return [item[0], item[1], grid[item[0]][item[1]]];
-                })];
-            } else if (tile === grid[0].length - 1) {
-                //check everything to left and bottom of tile
-                return [row, tile, range.slice(2, 5).map(item => {
-                    return [item[0], item[1], grid[item[0]][item[1]]];
-                })];
-            } else {
-                //check everything except for top of tile
-                return [row, tile, range.slice(0, 5).map(item => {
-                    return [item[0], item[1], grid[item[0]][item[1]]];
-                })];
-            } 
-        } else if (row === grid.length - 1) {
-            if (tile === 0) {
-                //check everything to right and top of tile
-                return [row, tile, [...range.slice(6), range[0]].map(item => {
-                    return [item[0], item[1], grid[item[0]][item[1]]];
-                })];
-            } else if (tile === grid[0].length - 1) {
-                //check everything to left and top of tile
-                return [row, tile, range.slice(4, 7).map(item => {
-                    return [item[0], item[1], grid[item[0]][item[1]]];
-                })];
-            } else {
-                //check everything except for bottom
-                return [row, tile, [...range.slice(4), range[0]].map(item => {
-                    return [item[0], item[1], grid[item[0]][item[1]]];
-                })];
-            } 
-        } else {
-            if (tile === 0) {
-                //check everything but left tiles
-                return [row, tile, [...range.slice(6), ...range.slice(0, 3)].map(item => {
-                    return [item[0], item[1], grid[item[0]][item[1]]];
-                })];
-            } else if (tile === grid[0].length - 1) {
-                //check everything but right tiles
-                return [row, tile, range.slice(2, 7).map(item => {
-                    return [item[0], item[1],grid[item[0]][item[1]]];
-                })];
-            } else {
-                //check all tiles
-                return [row, tile, range.map(item => {
-                    return [item[0], item[1], grid[item[0]][item[1]]];
-                })];
-            } 
-        }
-    };
+    }, [checkAdjecentTiles, generateActiveTiles]);
 
     const createGrid = () => {
+        const [rowSize, columnSize] = gridSize;
         const array = [];
-        for(let i = 0; i < 30; i++) {
+        for (let i = 0; i < rowSize; i++) {
             array.push([]);
-            for(let j = 0; j < 46; j++) {
+            for (let j = 0; j < columnSize; j++) {
                 array[i].push(0);
             }
         }
         return array;
     }
 
-    const buildNewGrid = () => {
+    const buildNewGrid = useCallback(() => {
         // 0 = dead, 1 = active, 2 = alive
         let newGrid = createGrid();
         for (let row of newGrid) {
@@ -161,7 +120,7 @@ function GameContainer() {
         }
         newGrid = generateActiveTiles(newGrid);
         setGrid(newGrid);
-    }
+    }, [generateActiveTiles]);
 
     const resetGame = () => {
         buildNewGrid();
@@ -177,11 +136,11 @@ function GameContainer() {
         if (!clearBoard) setClearBoard(true);
         setGenerations('-');
     }
-   
-    const advanceGameTimer = () => {
+
+    const advanceGameTimer = useCallback(() => {
         setGrid(grid => advanceGame(grid));
         setGenerations(generations => generations + 1);
-    }
+    }, [advanceGame]);
 
     useEffect(() => {
         let timer = null;
@@ -191,7 +150,7 @@ function GameContainer() {
             clearInterval(timer);
         }
         return () => clearInterval(timer);
-    }, [gameRunning]);
+    }, [gameRunning, clearBoard, advanceGameTimer]);
 
     const gameToggle = () => {
         if (clearBoard) resetGame();
@@ -204,12 +163,16 @@ function GameContainer() {
         setHistory(tempHistory);
     }*/
 
+    useEffect(() => {
+        buildNewGrid();
+    }, [buildNewGrid]);
+
     return (
         <main>
-            <GameGrid 
+            <GameGrid
                 grid={grid}
             />
-            <GameMenu 
+            <GameMenu
                 generations={generations}
                 toggle={gameToggle}
                 reset={resetGame}

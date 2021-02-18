@@ -21,17 +21,17 @@ function GameGrid(props) {
             );
         }));
         // props.addHistory(props.createHistory(flatGrid));
-    }, [ props.grid ]);
+    }, [props.grid]);
 
     useEffect(() => {
         const width = window.getComputedStyle(container.current).getPropertyValue('width');
-        container.current.style.height = (Number(width.replace('px', '')) * (450/690)) + 'px';
+        container.current.style.height = (Number(width.replace('px', '')) * (450 / 690)) + 'px';
         // container.current.style.transform = `scaley(${Number(width.replace('px', '')) / 690})`;
-      
-    }, [window.innerWidth]);
+
+    }, []);
 
     return (
-        <div 
+        <div
             id="game-grid"
             ref={container}
         >
